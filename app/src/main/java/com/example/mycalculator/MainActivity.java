@@ -1,5 +1,7 @@
 package com.example.mycalculator;
 
+import android.content.Intent;
+import android.view.View;
 import android.view.Window;
 import android.os.Bundle;
 import android.app.Activity;
@@ -11,8 +13,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends Activity {
-    TextView input,  output;
+    TextView input,  output, viewHistory;
+    HistoryActivity historyActivity;
 
+    private String[] historyData = new String[2];
     private ArrayList<String> arrOperation;
     private ArrayList<Double> arrNumber;
 
@@ -21,6 +25,12 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState != null) {
+            historyData = savedInstanceState.getStringArray("HISTORY");
+        } else {
+            historyData = new String[] {"", "0"};
+        }
 
         input = (TextView) findViewById(R.id.input);
         output = (TextView) findViewById(R.id.output);
@@ -42,6 +52,13 @@ public class MainActivity extends Activity {
         Button num7 = (Button) findViewById(R.id.num7);
         Button num8 = (Button) findViewById(R.id.num8);
         Button num9 = (Button) findViewById(R.id.num9);
+        viewHistory = (TextView) findViewById(R.id.tvhistory);
+
+        viewHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+            startActivity(intent);
+        });
+        historyActivity = new HistoryActivity();
 
         AC.setOnClickListener(v -> {
             input.setText("");
@@ -111,8 +128,25 @@ public class MainActivity extends Activity {
         result.setOnClickListener(v -> {
             if(input.getText().length() > 1 )
                 Result();
+            AddHistory();
             input.setText("");
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        historyData[0] = input.getText().toString();
+        historyData[1] = output.getText().toString();
+        outState.putStringArray("HISTORY", historyData);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        historyData = savedInstanceState.getStringArray("HISTORY");
+        input.setText(historyData[0]);
+        output.setText(historyData[1]);
     }
 
     public int addOperation(String input) {
@@ -180,5 +214,20 @@ public class MainActivity extends Activity {
             }
         }
         output.setText(String.format("%s", numberFormat.format(result)));
+    }
+
+    private void AddHistory() {
+        try {
+            String historyResult = input.getText().toString() + " = " + output.getText().toString();
+            addHistory(historyResult);
+        }
+        catch (Exception e) {
+
+        }
+    }
+
+    private void addHistory(String result) {
+        historyActivity = new HistoryActivity();
+        historyActivity.addCalculationToHistory(result);
     }
 }

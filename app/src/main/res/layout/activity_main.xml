@@ -46,6 +46,15 @@
                     android:textColor="#000"
                     android:textSize="50sp"
                     tools:ignore="RtlCompat" />
+
+                <TextView
+                    android:id="@+id/tvhistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:text="View History"
+                    android:textSize="34sp" />
             </LinearLayout>
 
         </LinearLayout>
